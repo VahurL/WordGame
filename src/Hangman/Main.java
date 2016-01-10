@@ -19,7 +19,7 @@ public class Main {
         String userGuess;
         String output;
         List<String> userHasGuessed = new ArrayList<String>();
-        int livesLeft = 5;
+        int wrongGuess = 0;
         int charLocation;
 
         // Set words and hints to guess
@@ -41,10 +41,19 @@ public class Main {
         currentWord = (String) words[number].toLowerCase();
         currentHint = (String) hints[number];
 
+        String stickman[] = new String[7];
+        stickman[0] = " --\n   |\n   |\n   |\n_____\n";
+        stickman[1] = " --\n o |\n   |\n   |\n_____\n";
+        stickman[2] = " --\n o |\n/  |\n   |\n_____\n";
+        stickman[3] = " --\n o |\n/| |\n   |\n_____\n";
+        stickman[4] = " --\n o |\n/|\\|\n   |\n_____\n";
+        stickman[5] = " --\n o |\n/|\\|\n/  |\n_____\n";
+        stickman[6] = " --\n o |\n/|\\|\n/ \\|\n_____\n";
+
         System.out.println(" ------------------------------------------");
         System.out.println("| Tere tulemast mängima Hangman mängu!     |");
         System.out.println(" ------------------------------------------");
-        System.out.println("| Reeglid: Pead ära arvama sõna 5 katsega. |");
+        System.out.println("| Reeglid: Pead ära arvama sõna 6 katsega. |");
         System.out.println("|                                          |");
         System.out.println("| Vihje saamiseks kirjuta 'vihje!'         |");
         System.out.println("| Mängust väljumiseks kirjuta 'exit'.      |");
@@ -59,15 +68,19 @@ public class Main {
 
         output = guessedWord.toString();
 
-        System.out.println("\nÄraarvatav sõna: " + wordOutputToUser);
+        // display first stickman image
+        System.out.println("\n" + stickman[0]);
+
+        System.out.println("Äraarvatav sõna: " + wordOutputToUser);
 
         // Start game loop
-        while (output.contains("*") && livesLeft > 0) { // check if there is any characters to guess or lives left
+        while (output.contains("*") && wrongGuess < 6) { // check if there is any characters to guess or lives left
             Scanner userInput = new Scanner(System.in);
             // If user haven't guessed yet, then show this lines
             if (!userHasGuessed.isEmpty()) {
                 System.out.println("\n" + guessedWord.toString().toUpperCase());
-                System.out.println("\nElusid järgi: " + livesLeft); // show how much lives left
+                System.out.println("\n" + stickman[(wrongGuess)]);
+                System.out.println("\nElusid järgi: " + (6 - wrongGuess)); // show how much lives left
                 System.out.println("Pakutud tähed: " + userHasGuessed.toString().toUpperCase()); // show letters what user is guessed
             }
             System.out.println("Sinu pakkumine?");
@@ -97,12 +110,16 @@ public class Main {
                     if (currentWord.contains(userGuess)) {
                         userHasGuessed.add(userGuess); // add letter to guessed list
                         System.out.print("\nHästi pakutud!\n");
-
+                        // change user input string to char
                         char guessedChar = userGuess.charAt(0);
+                        // search for user guessed letter in word
                         charLocation = guessedWord2.indexOf(userGuess);
+                        // set character visible to user
                         guessedWord.setCharAt(charLocation, guessedChar);
+                        // replace character with _ in string what user can't see
                         guessedWord2.setCharAt(charLocation, '_');
 
+                        // if there is more than one guessed character then repeat previous
                         while (charLocation > -1) {
                             guessedChar = userGuess.charAt(0);
                             charLocation = guessedWord2.indexOf(userGuess);
@@ -113,7 +130,7 @@ public class Main {
                         }
                     } else {
                         // if user guess is wrong
-                        livesLeft = livesLeft - 1;
+                        wrongGuess = wrongGuess + 1;
                         userHasGuessed.add(userGuess); // add letter to guessed list
                         System.out.print("\nProovi uuesti!\n");
                     }
@@ -130,7 +147,8 @@ public class Main {
         }
 
         // Text to display when user has lost
-        if (livesLeft == 0) {
+        if (wrongGuess == 6) {
+            System.out.println("\n" + stickman[(wrongGuess)]);
             System.out.println("Kahjuks kaotasid mängu!");
             System.out.println("Äraarvatav sõna oli " + currentWord.toUpperCase() + ".");
         }
