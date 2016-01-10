@@ -4,37 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
-import java.io.*;
 
 public class Main {
 
     public static void main(String[] args) {
+        // Start the game
         playGame(args);
     }
-
-    /*
-    public static final String dictionary = "src/words.txt";
-
-    public static void main(String[] args) throws FileNotFoundException {
-        // open the dictionary file and read dictionary into an ArrayList
-        Scanner input = new Scanner(new File(dictionary));
-        List<String> dictionaryArray = new ArrayList<String>();
-        while (input.hasNext()) {
-            dictionaryArray.add(input.next().toUpperCase());
-        }
-
-        Random randomWord = new Random();
-        String currentWord = "";
-        currentWord = dictionaryArray.get(randomWord.nextInt(dictionaryArray.size()));
-        System.out.println(currentWord);
-
-        if (dictionaryArray.isEmpty()) {
-            System.out.println("Kahjuks pole failis sobivaid sõnu!");
-        } else {
-            playGame(args);
-        }
-    }
-*/
 
     public static void playGame(String args[]) {
         String currentWord = "";
@@ -65,68 +41,80 @@ public class Main {
         currentWord = (String) words[number].toLowerCase();
         currentHint = (String) hints[number];
 
-        System.out.println("Tere tulemast mängima Hangman mängu.");
-        System.out.println("=========================");
-        System.out.println("Reeglid: Pead ära arvama sõna 5 katsega.");
-        System.out.println();
-        System.out.println("Valitud sõna: " + currentWord);
-        System.out.println("Valitud sõna vihje: " + currentHint);
-        System.out.println("Valitud sõna pikkus: " + currentWord.length());
+        System.out.println(" ------------------------------------------");
+        System.out.println("| Tere tulemast mängima Hangman mängu!     |");
+        System.out.println(" ------------------------------------------");
+        System.out.println("| Reeglid: Pead ära arvama sõna 5 katsega. |");
+        System.out.println("|                                          |");
+        System.out.println("| Vihje saamiseks kirjuta 'vihje!'         |");
+        System.out.println("| Mängust väljumiseks kirjuta 'exit'.      |");
+        System.out.println(" ------------------------------------------");
 
-        System.out.println();
-        System.out.println();
-
-        // Change all characters to something else
+        // Change all lowercase characters to *
         wordOutputToUser = currentWord.replaceAll("[a-z]", "*");
 
+        // Make to StringBuilders
         StringBuilder guessedWord = new StringBuilder(wordOutputToUser);
         StringBuilder guessedWord2 = new StringBuilder(currentWord);
 
         output = guessedWord.toString();
 
-        System.out.println("Sinu äraarvatav sõna: " + wordOutputToUser);
+        System.out.println("\nÄraarvatav sõna: " + wordOutputToUser);
 
-        while (output.contains("*") && livesLeft > 0) {
+        // Start game loop
+        while (output.contains("*") && livesLeft > 0) { // check if there is any characters to guess or lives left
             Scanner userInput = new Scanner(System.in);
+            // If user haven't guessed yet, then show this lines
             if (!userHasGuessed.isEmpty()) {
                 System.out.println("\n" + guessedWord.toString().toUpperCase());
-                System.out.println("\nElusid järgi: " + livesLeft);
-                System.out.println("Pakutud tähed: " + userHasGuessed.toString().toUpperCase());
+                System.out.println("\nElusid järgi: " + livesLeft); // show how much lives left
+                System.out.println("Pakutud tähed: " + userHasGuessed.toString().toUpperCase()); // show letters what user is guessed
             }
             System.out.println("Sinu pakkumine?");
-            userGuess = userInput.nextLine().toLowerCase();
-            // If user enters X word then exit game
+            userGuess = userInput.nextLine().toLowerCase(); // ask input from user
+            // if user don't input anything
+            if (userGuess.isEmpty()) {
+                System.out.println("Kahjuks ei sisestanud sa ühtegi tähte!");
+                System.out.println("-------------------");
+                continue; // continue from beginning of loop
+            }
+            // if user asks for clue
+            if (userGuess.equals("vihje!")) {
+                System.out.println("Vihje: " + currentHint);
+                System.out.println("-------------------");
+                continue; // continue from beginning of loop
+            }
+            // if user wish to exit game
             if (userGuess.equals("exit")) {
                 System.out.println("\nLõpetame mängu!");
-                System.exit(0);
+                System.exit(0); // exit from game
             } else {
+                // if user has already guessed entered letter
                 if (userHasGuessed.contains(userGuess)) {
                     System.out.println("\nOled seda tähte juba pakkunud!");
                 } else {
+                    // if user guessed correctly
                     if (currentWord.contains(userGuess)) {
-                        userHasGuessed.add(userGuess);
+                        userHasGuessed.add(userGuess); // add letter to guessed list
                         System.out.print("\nHästi pakutud!\n");
 
                         char guessedChar = userGuess.charAt(0);
                         charLocation = guessedWord2.indexOf(userGuess);
-//                        System.out.println(charLocation);
                         guessedWord.setCharAt(charLocation, guessedChar);
                         guessedWord2.setCharAt(charLocation, '_');
-//                        System.out.println(guessedWord2);
 
                         while (charLocation > -1) {
                             guessedChar = userGuess.charAt(0);
                             charLocation = guessedWord2.indexOf(userGuess);
-//                            System.out.println(charLocation);
                             if (charLocation > -1) {
                                 guessedWord.setCharAt(charLocation, guessedChar);
                                 guessedWord2.setCharAt(charLocation, '_');
-//                                System.out.println(guessedWord2);
                             }
                         }
                     } else {
+                        // if user guess is wrong
                         livesLeft = livesLeft - 1;
-                        userHasGuessed.add(userGuess);
+                        userHasGuessed.add(userGuess); // add letter to guessed list
                         System.out.print("\nProovi uuesti!\n");
                     }
                 }
